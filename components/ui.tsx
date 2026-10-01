@@ -1,5 +1,5 @@
-import { PropsWithChildren, ReactNode, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
+import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
+import { Modal, NativeSyntheticEvent, NativeScrollEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, shadow } from '@/constants/theme';
 import { formatJapaneseDate, monthDays, pad, parseDateKey, toDateKey } from '@/lib/date';
@@ -64,10 +64,16 @@ export function TimeSelector({ label, value, onChange }: { label: string; value:
   const [visible, setVisible] = useState(false);
   const [hour, setHour] = useState(9);
   const [minute, setMinute] = useState(0);
-  const hours = Array.from({ length: 24 }, (_, index) => index);
-  const minutes = Array.from({ length: 12 }, (_, index) => index * 5);
-  const open = () => { const [nextHour, nextMinute] = value ? value.split(':').map(Number) : [9, 0]; setHour(nextHour); setMinute(minutes.includes(nextMinute) ? nextMinute : Math.round(nextMinute / 5) * 5 % 60); setVisible(true); };
-  return <View style={styles.field}><Text style={styles.label}>{label}</Text><Pressable onPress={open} style={({ pressed }) => [styles.selector, pressed && styles.pressed]}><Text style={value ? styles.selectorText : styles.selectorPlaceholder}>{value ?? '時間を選択'}</Text><Text style={styles.selectorIcon}>◷</Text></Pressable><Modal visible={visible} transparent animationType="slide" onRequestClose={() => setVisible(false)}><View style={styles.modalOverlay}><View style={styles.modalSheet}><View style={styles.modalHeader}><Text style={styles.modalTitle}>{label}</Text><Pressable onPress={() => setVisible(false)}><Text style={styles.modalClose}>閉じる</Text></Pressable></View><Text style={styles.timeHint}>時と分をスクロールして選択</Text><View style={styles.timePicker}><ScrollView style={styles.timeColumn} contentContainerStyle={styles.timeColumnContent} showsVerticalScrollIndicator={false}>{hours.map((item) => <Pressable key={item} onPress={() => setHour(item)} style={[styles.timeOption, item === hour && styles.timeOptionSelected]}><Text style={[styles.timeOptionText, item === hour && styles.timeOptionSelectedText]}>{pad(item)}</Text></Pressable>)}</ScrollView><Text style={styles.timeSeparator}>:</Text><ScrollView style={styles.timeColumn} contentContainerStyle={styles.timeColumnContent} showsVerticalScrollIndicator={false}>{minutes.map((item) => <Pressable key={item} onPress={() => setMinute(item)} style={[styles.timeOption, item === minute && styles.timeOptionSelected]}><Text style={[styles.timeOptionText, item === minute && styles.timeOptionSelectedText]}>{pad(item)}</Text></Pressable>)}</ScrollView></View><AppButton title={`${pad(hour)}:${pad(minute)}で決定`} onPress={() => { onChange(`${pad(hour)}:${pad(minute)}`); setVisible(false); }} /></View></View></Modal></View>;
+  const hours = Array.from({ length: 72 }, (_, index) => index % 24);
+  const minutes = Array.from({ length: 36 }, (_, index) => (index % 12) * 5);
+  const hourRef = useRef<ScrollView>(null);
+  const minuteRef = useRef<ScrollView>(null);
+  const rowHeight = 44;
+  const open = () => { const [nextHour, nextMinute] = value ? value.split(':').map(Number) : [9, 0]; setHour(nextHour); setMinute(Math.round(nextMinute / 5) * 5 % 60); setVisible(true); };
+  useEffect(() => { if (!visible) return; requestAnimationFrame(() => { hourRef.current?.scrollTo({ y: (24 + hour) * rowHeight, animated: false }); minuteRef.current?.scrollTo({ y: (12 + Math.round(minute / 5)) * rowHeight, animated: false }); }); }, [visible, hour, minute]);
+  const updateHour = (event: NativeSyntheticEvent<NativeScrollEvent>) => { const index = Math.round(event.nativeEvent.contentOffset.y / rowHeight); setHour(((index % 24) + 24) % 24); };
+  const updateMinute = (event: NativeSyntheticEvent<NativeScrollEvent>) => { const index = Math.round(event.nativeEvent.contentOffset.y / rowHeight); const normalized = ((index % 12) + 12) % 12; setMinute(normalized * 5); };
+  return <View style={styles.field}><Text style={styles.label}>{label}</Text><Pressable onPress={open} style={({ pressed }) => [styles.selector, pressed && styles.pressed]}><Text style={value ? styles.selectorText : styles.selectorPlaceholder}>{value ?? '時間を選択'}</Text><Text style={styles.selectorIcon}>◷</Text></Pressable><Modal visible={visible} transparent animationType="slide" onRequestClose={() => setVisible(false)}><View style={styles.modalOverlay}><View style={styles.modalSheet}><View style={styles.modalHeader}><Text style={styles.modalTitle}>{label}</Text><Pressable onPress={() => setVisible(false)}><Text style={styles.modalClose}>閉じる</Text></Pressable></View><Text style={styles.timeHint}>中央のラインに合わせて、時と分をダイヤルのようにスクロール</Text><View style={styles.timePicker}><View style={styles.wheelViewport}><ScrollView ref={hourRef} style={styles.timeColumn} contentContainerStyle={styles.timeColumnContent} showsVerticalScrollIndicator={false} snapToInterval={rowHeight} decelerationRate="fast" onMomentumScrollEnd={updateHour}>{hours.map((item, index) => <Pressable key={`hour-${index}`} onPress={() => { setHour(item); hourRef.current?.scrollTo({ y: index * rowHeight, animated: true }); }} style={[styles.timeOption, item === hour && styles.timeOptionSelected]}><Text style={[styles.timeOptionText, item === hour && styles.timeOptionSelectedText]}>{pad(item)}</Text></Pressable>)}</ScrollView><View pointerEvents="none" style={styles.wheelHighlight} /><View pointerEvents="none" style={[styles.wheelFade, styles.wheelFadeTop]} /><View pointerEvents="none" style={[styles.wheelFade, styles.wheelFadeBottom]} /></View><Text style={styles.timeSeparator}>:</Text><View style={styles.wheelViewport}><ScrollView ref={minuteRef} style={styles.timeColumn} contentContainerStyle={styles.timeColumnContent} showsVerticalScrollIndicator={false} snapToInterval={rowHeight} decelerationRate="fast" onMomentumScrollEnd={updateMinute}>{minutes.map((item, index) => <Pressable key={`minute-${index}`} onPress={() => { setMinute(item); minuteRef.current?.scrollTo({ y: index * rowHeight, animated: true }); }} style={[styles.timeOption, item === minute && styles.timeOptionSelected]}><Text style={[styles.timeOptionText, item === minute && styles.timeOptionSelectedText]}>{pad(item)}</Text></Pressable>)}</ScrollView><View pointerEvents="none" style={styles.wheelHighlight} /><View pointerEvents="none" style={[styles.wheelFade, styles.wheelFadeTop]} /><View pointerEvents="none" style={[styles.wheelFade, styles.wheelFadeBottom]} /></View></View><AppButton title={`${pad(hour)}:${pad(minute)}で決定`} onPress={() => { onChange(`${pad(hour)}:${pad(minute)}`); setVisible(false); }} /></View></View></Modal></View>;
 }
 
 export function Header({ title, subtitle, right }: { title: string; subtitle?: string; right?: ReactNode }) {
@@ -138,11 +144,16 @@ const styles = StyleSheet.create({
   clearDateText: { color: colors.muted, fontWeight: '700' },
   timeHint: { color: colors.muted, textAlign: 'center', fontSize: 13, marginBottom: 10 },
   timePicker: { height: 245, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  timeColumn: { width: 105, backgroundColor: colors.surface, borderRadius: 16 },
-  timeColumnContent: { paddingVertical: 86 },
-  timeOption: { height: 42, alignItems: 'center', justifyContent: 'center', marginHorizontal: 12, borderRadius: 11 },
+  wheelViewport: { width: 105, height: 245, backgroundColor: colors.surface, borderRadius: 16, overflow: 'hidden' },
+  timeColumn: { width: 105, height: 245 },
+  timeColumnContent: { paddingVertical: 100.5 },
+  timeOption: { height: 44, alignItems: 'center', justifyContent: 'center', marginHorizontal: 12, borderRadius: 11 },
   timeOptionSelected: { backgroundColor: colors.primary },
   timeOptionText: { color: colors.ink, fontSize: 19, fontWeight: '800' },
   timeOptionSelectedText: { color: '#fff' },
+  wheelHighlight: { position: 'absolute', left: 0, right: 0, top: 100.5, height: 44, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#B7C7FF', backgroundColor: 'rgba(58,111,247,0.06)' },
+  wheelFade: { position: 'absolute', left: 0, right: 0, height: 64, backgroundColor: 'rgba(255,255,255,0.88)' },
+  wheelFadeTop: { top: 0 },
+  wheelFadeBottom: { bottom: 0 },
   timeSeparator: { color: colors.ink, fontSize: 25, fontWeight: '900', marginHorizontal: 10 },
 });
