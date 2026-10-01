@@ -1,0 +1,13 @@
+node_modules/
+.expo/
+dist/
+build/
+web-build/
+expo-export*/
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+.DS_Store
+*.log

@@ -1,0 +1,13 @@
+export const pad = (value: number) => String(value).padStart(2, '0');
+export const toDateKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+export const parseDateKey = (value: string) => { const [year, month, day] = value.split('-').map(Number); return new Date(year, month - 1, day); };
+export const formatJapaneseDate = (value: string | Date) => { const date = typeof value === 'string' ? parseDateKey(value) : value; return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`; };
+export const formatJapaneseMonth = (date: Date) => `${date.getFullYear()}年${date.getMonth() + 1}月`;
+export const formatShortDate = (value: string) => { const date = parseDateKey(value); return `${date.getMonth() + 1}月${date.getDate()}日`; };
+export const weekdayJapanese = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+export const formatHeaderDate = (date = new Date()) => `${formatJapaneseDate(date)} ${weekdayJapanese[date.getDay()]}`;
+export const monthRange = (date: Date) => ({ start: toDateKey(new Date(date.getFullYear(), date.getMonth(), 1)), end: toDateKey(new Date(date.getFullYear(), date.getMonth() + 1, 0)) });
+export const monthDays = (date: Date) => { const first = new Date(date.getFullYear(), date.getMonth(), 1); const total = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(); const cells: Array<Date | null> = Array(first.getDay()).fill(null); for (let day = 1; day <= total; day += 1) cells.push(new Date(date.getFullYear(), date.getMonth(), day)); while (cells.length % 7 !== 0) cells.push(null); return cells; };
+export const todayKey = () => toDateKey(new Date());
+export const displayTime = (startTime: string | null, endTime?: string | null, isAllDay?: boolean) => { if (isAllDay) return '終日'; if (!startTime) return '時間未定'; return endTime ? `${startTime} – ${endTime}` : startTime; };
+export const isoNow = () => new Date().toISOString();

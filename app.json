@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "暮らしノート",
+    "slug": "life-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "life-manager",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F7F8FA"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.lifemanager"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F8FA"
+      },
+      "package": "com.example.lifemanager"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ]
+  }
+}
