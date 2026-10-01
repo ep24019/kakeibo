@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { colors, categoryColors, shadow } from '@/constants/theme';
 import { getEvents } from '@/lib/db';
 import { formatJapaneseMonth, monthDays, monthRange, parseDateKey, toDateKey, todayKey } from '@/lib/date';
@@ -10,7 +10,7 @@ import { AppButton, Card, EmptyState, Header, Screen } from '@/components/ui';
 import { EventCard } from '@/components/records';
 
 export default function CalendarScreen() {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [month, setMonth] = useState(new Date());
   const [selected, setSelected] = useState(todayKey());

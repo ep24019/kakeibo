@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { colors } from '@/constants/theme';
 import { getTodos, toggleTodo } from '@/lib/db';
 import type { Todo } from '@/types/models';
@@ -9,7 +9,7 @@ import { Card, EmptyState, Header, Screen } from '@/components/ui';
 import { TodoCard } from '@/components/records';
 
 export default function TodoListScreen() {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState('');

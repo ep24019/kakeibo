@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { colors, shadow } from '@/constants/theme';
 import { getEvents, getMonthlyBudget, getMonthlySummary, getTodos, toggleTodo } from '@/lib/db';
 import { formatHeaderDate, monthRange, todayKey } from '@/lib/date';
@@ -11,7 +11,7 @@ import { Card, EmptyState, Header, SectionHeader, Screen, StatCard } from '@/com
 import { EventCard, TodoCard } from '@/components/records';
 
 export default function HomeScreen() {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);

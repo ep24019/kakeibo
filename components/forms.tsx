@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { eventCategories, expenseCategories, incomeCategories, paymentMethods, colors } from '@/constants/theme';
 import { getEvents, saveEvent, saveTodo, saveTransaction } from '@/lib/db';
 import { todayKey } from '@/lib/date';
@@ -17,7 +17,7 @@ const isDateKey = (value: string) => {
 };
 
 export function EventForm({ initial, initialDate }: { initial?: Event | null; initialDate?: string }) {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? '');
   const [date, setDate] = useState(initial?.date ?? initialDate ?? todayKey());
@@ -52,7 +52,7 @@ export function EventForm({ initial, initialDate }: { initial?: Event | null; in
 }
 
 export function TodoForm({ initial, onDelete }: { initial?: Todo | null; onDelete?: () => void }) {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? '');
   const [dueDate, setDueDate] = useState(initial?.dueDate ?? '');
@@ -72,7 +72,7 @@ export function TodoForm({ initial, onDelete }: { initial?: Todo | null; onDelet
 }
 
 export function TransactionForm({ initial, initialType = 'expense', initialEventId, onDelete }: { initial?: Transaction | null; initialType?: TransactionType; initialEventId?: number | null; onDelete?: () => void }) {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [type, setType] = useState<TransactionType>(initial?.type ?? initialType);
   const [amount, setAmount] = useState(initial?.amount ? String(initial.amount) : '');

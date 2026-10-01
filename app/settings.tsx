@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { AppButton, Card, Header, MoneyInput, Screen } from '@/components/ui';
 import { getMonthlyBudget, setMonthlyBudget } from '@/lib/db';
 import { parseMoney } from '@/lib/format';
 import { colors } from '@/constants/theme';
 
 export default function SettingsScreen() {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [budget, setBudget] = useState('');
   const [error, setError] = useState('');

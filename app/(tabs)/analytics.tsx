@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { categoryColors, colors } from '@/constants/theme';
 import { getCategoryTotals, getMonthlySummary } from '@/lib/db';
 import { formatJapaneseMonth, monthRange } from '@/lib/date';
@@ -12,7 +12,7 @@ import { Card, EmptyState, Header, SectionHeader, Screen } from '@/components/ui
 type MonthlyTotal = { label: string; total: number };
 
 export default function AnalyticsScreen() {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const [categoryTotals, setCategoryTotals] = useState<CategoryTotal[]>([]);
   const [monthlyTotals, setMonthlyTotals] = useState<MonthlyTotal[]>([]);
   const [currentSummary, setCurrentSummary] = useState<MonthlySummary>({ income: 0, expense: 0 });

@@ -23,6 +23,8 @@
 
 追加のチャートライブラリは使用せず、分析画面のバー表示は標準Viewで描画しています。
 
+PCブラウザで起動した場合はSQLiteの代わりにlocalStorageを使うWeb互換データ層が動作します。スマートフォンのAndroid/iOSではSQLiteに保存します。
+
 ## インストール方法
 
 Node.js（LTS）とnpmを用意し、プロジェクト直下で実行します。
@@ -46,6 +48,8 @@ npm run android
 npm run ios
 npm run web
 ```
+
+PCブラウザで確認する場合は `npm run web` を実行し、`http://localhost:8081/` を開きます。
 
 初回起動時に `life-manager.db` が作成され、必要なテーブルが自動作成されます。
 

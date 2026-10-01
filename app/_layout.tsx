@@ -1,7 +1,6 @@
 import { Stack } from 'expo-router';
-import { SQLiteProvider } from 'expo-sqlite';
-import { migrateDbIfNeeded } from '@/database/migrations';
+import { DatabaseProvider } from '@/lib/database-provider';
 
 export default function RootLayout() {
-  return <SQLiteProvider databaseName="life-manager.db" onInit={migrateDbIfNeeded} useSuspense={false}><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F7F8FA' } }} /></SQLiteProvider>;
+  return <DatabaseProvider><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F7F8FA' } }} /></DatabaseProvider>;
 }

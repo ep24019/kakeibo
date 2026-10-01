@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { colors } from '@/constants/theme';
 import { getMonthlySummary, getTransactions } from '@/lib/db';
 import { formatJapaneseMonth, formatShortDate, monthRange } from '@/lib/date';
@@ -11,7 +11,7 @@ import { Card, EmptyState, Header, SectionHeader, Screen, StatCard } from '@/com
 import { TransactionCard } from '@/components/records';
 
 export default function FinanceScreen() {
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const [month, setMonth] = useState(new Date());
   const [summary, setSummary] = useState<MonthlySummary>({ income: 0, expense: 0 });

@@ -1,6 +1,6 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import type { DatabaseLike } from '@/lib/database';
 
-export async function migrateDbIfNeeded(db: SQLiteDatabase) {
+export async function migrateDbIfNeeded(db: DatabaseLike) {
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;

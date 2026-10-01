@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useAppDatabase } from '@/lib/database-provider';
 import { colors, categoryColors } from '@/constants/theme';
 import { deleteEvent, getEvent, getEventSpent, getTransactions } from '@/lib/db';
 import { displayTime, formatJapaneseDate } from '@/lib/date';
@@ -12,7 +12,7 @@ import { TransactionCard } from '@/components/records';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const db = useSQLiteContext();
+  const db = useAppDatabase();
   const router = useRouter();
   const eventId = Number(id);
   const [event, setEvent] = useState<Event | null>(null);
