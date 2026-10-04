@@ -44,7 +44,7 @@ export function EventForm({ initial, initialDate }: { initial?: Event | null; in
     try {
       setSaving(true); setError('');
       await saveEvent(db, { title: title.trim(), date, startTime: isAllDay || !startTime ? null : startTime, endTime: isAllDay || !endTime ? null : endTime, isAllDay, category, location: location.trim() || null, memo: memo.trim() || null, budget: parseMoney(budget) }, initial?.id);
-      router.back();
+      router.replace('/calendar');
     } catch { setError('予定を保存できませんでした。'); } finally { setSaving(false); }
   };
 
@@ -66,7 +66,7 @@ export function TodoForm({ initial, onDelete }: { initial?: Todo | null; onDelet
   const submit = async () => {
     if (!title.trim()) return setError('タイトルを入力してください');
     if (dueDate && !isDateKey(dueDate)) return setError('期限はYYYY-MM-DD形式で入力してください');
-    try { setSaving(true); setError(''); await saveTodo(db, { title: title.trim(), dueDate: dueDate || null, category: category.trim() || null, priority: priority === '高' ? 'high' : priority === '低' ? 'low' : 'medium', memo: memo.trim() || null, completed: initial?.completed ?? false }, initial?.id); router.back(); } catch { setError('Todoを保存できませんでした。'); } finally { setSaving(false); }
+    try { setSaving(true); setError(''); await saveTodo(db, { title: title.trim(), dueDate: dueDate || null, category: category.trim() || null, priority: priority === '高' ? 'high' : priority === '低' ? 'low' : 'medium', memo: memo.trim() || null, completed: initial?.completed ?? false }, initial?.id); router.replace('/todo'); } catch { setError('Todoを保存できませんでした。'); } finally { setSaving(false); }
   };
   return <Screen><Header title={initial ? 'Todoを編集' : 'Todoを追加'} subtitle="やることを整理して、頭を軽く" /><Field label="タイトル *" value={title} onChangeText={setTitle} placeholder="例：レポートを提出" /><DateSelector label="期限" value={dueDate || null} onChange={(value) => setDueDate(value ?? '')} clearable /><Field label="カテゴリ" value={category} onChangeText={setCategory} placeholder="例：大学" /><ChoiceRow label="優先度" options={['高', '中', '低']} value={priority} onChange={setPriority} /><Field label="メモ" value={memo} onChangeText={setMemo} placeholder="補足メモ" multiline numberOfLines={4} style={styles.multiline} /><AppButton title={saving ? '保存中…' : '保存する'} onPress={() => void submit()} disabled={saving} />{initial && onDelete ? <AppButton title="Todoを削除" onPress={onDelete} variant="danger" /> : null}{error ? <Text style={styles.error}>{error}</Text> : null}</Screen>;
 }
@@ -93,7 +93,7 @@ export function TransactionForm({ initial, initialType = 'expense', initialEvent
   const submit = async () => {
     if (!amount || parseMoney(amount) <= 0) return setError('金額を入力してください');
     if (!isDateKey(date)) return setError('日付はYYYY-MM-DD形式で入力してください');
-    try { setSaving(true); setError(''); await saveTransaction(db, { type, amount: parseMoney(amount), date, category, paymentMethod: type === 'expense' ? paymentMethod : null, shopName: type === 'expense' ? shopName.trim() || null : null, memo: memo.trim() || null, eventId: type === 'expense' ? eventId : null }, initial?.id); router.back(); } catch { setError('収支を保存できませんでした。'); } finally { setSaving(false); }
+    try { setSaving(true); setError(''); await saveTransaction(db, { type, amount: parseMoney(amount), date, category, paymentMethod: type === 'expense' ? paymentMethod : null, shopName: type === 'expense' ? shopName.trim() || null : null, memo: memo.trim() || null, eventId: type === 'expense' ? eventId : null }, initial?.id); router.replace('/finance'); } catch { setError('収支を保存できませんでした。'); } finally { setSaving(false); }
   };
 
   const categoryOptions = type === 'expense' ? expenseCategories : incomeCategories;

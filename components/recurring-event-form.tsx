@@ -82,7 +82,7 @@ export function RecurringEventForm() {
         budget: parseMoney(budget),
       };
       for (const date of targetDates) await saveEvent(db, { ...eventData, date });
-      router.back();
+      router.replace('/calendar');
     } catch {
       setError('予定を一括登録できませんでした。');
     } finally {
