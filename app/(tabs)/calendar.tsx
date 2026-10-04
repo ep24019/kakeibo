@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useAppDatabase } from '@/lib/database-provider';
 import { colors, categoryColors, shadow } from '@/constants/theme';
-import { getEvents } from '@/lib/db';
+import { deduplicateEvents, getEvents } from '@/lib/db';
 import { formatJapaneseMonth, monthDays, monthRange, parseDateKey, toDateKey, todayKey } from '@/lib/date';
 import type { Event } from '@/types/models';
 import { AppButton, Card, EmptyState, Header, Screen } from '@/components/ui';
@@ -21,6 +21,7 @@ export default function CalendarScreen() {
     try {
       setError('');
       const range = monthRange(month);
+      await deduplicateEvents(db);
       setEvents(await getEvents(db, range.start, range.end));
     } catch {
       setError('カレンダーを読み込めませんでした。');

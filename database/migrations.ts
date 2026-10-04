@@ -1,4 +1,5 @@
 import type { DatabaseLike } from '@/lib/database';
+import { deduplicateEvents } from '@/lib/db';
 
 export async function migrateDbIfNeeded(db: DatabaseLike) {
   await db.execAsync(`
@@ -12,4 +13,5 @@ export async function migrateDbIfNeeded(db: DatabaseLike) {
     CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
     CREATE INDEX IF NOT EXISTS idx_transactions_event ON transactions(eventId);
   `);
+  await deduplicateEvents(db);
 }

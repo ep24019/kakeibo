@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, eventCategories } from '@/constants/theme';
@@ -47,14 +47,16 @@ export function RecurringEventForm() {
   const [budget, setBudget] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
 
-  const targetDates = useMemo(() => isDateKey(startDate) && isDateKey(endDate) && startDate <= endDate ? datesForWeekdays(startDate, endDate, weekdays) : [], [startDate, endDate, weekdays]);
+  const targetDates = useMemo(() => isDateKey(startDate) && isDateKey(endDate) && startDate <= endDate ? [...new Set(datesForWeekdays(startDate, endDate, weekdays))] : [], [startDate, endDate, weekdays]);
 
   const toggleWeekday = (weekday: number) => {
     setWeekdays((current) => current.includes(weekday) ? current.filter((item) => item !== weekday) : [...current, weekday].sort((a, b) => a - b));
   };
 
   const submit = async () => {
+    if (savingRef.current) return;
     if (!title.trim()) return setError('タイトルを入力してください');
     if (!isDateKey(startDate) || !isDateKey(endDate)) return setError('開始日と終了日を正しく設定してください');
     if (startDate > endDate) return setError('終了日は開始日以降に設定してください');
@@ -69,6 +71,7 @@ export function RecurringEventForm() {
     if (!targetDates.length) return setError('指定期間に該当する曜日がありません');
 
     try {
+      savingRef.current = true;
       setSaving(true);
       setError('');
       const eventData = {
@@ -86,6 +89,7 @@ export function RecurringEventForm() {
     } catch {
       setError('予定を一括登録できませんでした。');
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   };
