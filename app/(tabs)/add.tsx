@@ -5,6 +5,7 @@ import { Card, Header, Screen } from '@/components/ui';
 
 const actions = [
   { title: '予定を追加', description: '日時・場所・予算を登録', icon: '◷', color: colors.primary, path: '/event/new' },
+  { title: '予定を一括追加', description: '曜日と期間を指定して授業などを登録', icon: '↻', color: colors.teal, path: '/event/recurring' },
   { title: 'Todoを追加', description: 'やることと期限を登録', icon: '✓', color: colors.purple, path: '/todo/new' },
   { title: '支出を追加', description: '使ったお金を予定と連携', icon: '↘', color: colors.danger, path: '/transaction/new?type=expense' },
   { title: '収入を追加', description: '給与などの収入を登録', icon: '↗', color: colors.success, path: '/transaction/new?type=income' },
